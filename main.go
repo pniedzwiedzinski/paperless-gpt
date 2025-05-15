@@ -226,6 +226,8 @@ func main() {
 		MistralModel:             os.Getenv("MISTRAL_MODEL"),
 		DoclingURL:               doclingURL,
 		DoclingImageExportMode:   doclingImageExportMode,
+		SuryaEndpoint:            os.Getenv("SURYA_ENDPOINT"),
+		SuryaToken:               os.Getenv("SURYA_TOKEN"),
 		EnableHOCR:               true, // Always generate hOCR struct if provider supports it
 	}
 
@@ -472,6 +474,16 @@ func validateOrDefaultEnvVars() {
 			log.Fatal("Please set the AZURE_DOCAI_KEY environment variable for Azure provider")
 		}
 	}
+
+	if ocrProvider == "surya" {
+		if os.Getenv("SURYA_ENDPOINT") == "" {
+			log.Fatal("Please set the SURYA_ENDPOINT environment variable for Surya provider")
+		}
+		if os.Getenv("SURYA_TOKEN") == "" {
+			log.Fatal("Please set the SURYA_TOKEN environment variable for Surya provider")
+		}
+	}
+
 
 	if ocrProvider == "docling" {
 		if doclingURL == "" {
