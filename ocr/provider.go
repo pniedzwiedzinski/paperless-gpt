@@ -32,6 +32,10 @@ type Config struct {
 	// Provider type (e.g., "llm", "google_docai", "azure", "mistral_ocr")
 	Provider string
 
+	// Surya settings
+	SuryaEndpoint string
+	SuryaAuthToken string
+
 	// Mistral OCR settings
 	MistralAPIKey string
 	MistralModel  string // Optional, defaults to "mistral-ocr-latest"
@@ -67,6 +71,13 @@ func NewProvider(config Config) (Provider, error) {
 	log.Info("Initializing OCR provider: ", config.Provider)
 
 	switch config.Provider {
+
+	case "surya":
+		if config.SuryaEndpoint == "" || config.SuryaAuthToken == "" {
+			return nil, fmt.Errorf("missing required Surya configuration")
+		}
+		return NewSuryaOCRProvider(config)
+		
 	case "google_docai":
 		if config.GoogleProjectID == "" || config.GoogleLocation == "" || config.GoogleProcessorID == "" {
 			return nil, fmt.Errorf("missing required Google Document AI configuration")
