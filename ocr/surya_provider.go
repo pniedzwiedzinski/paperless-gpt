@@ -7,9 +7,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
-	"os"
+
+	_ "image/jpeg"
+	
+	"github.com/sirupsen/logrus"
 )
 
 // SuryaOCRProvider implements the ocr.Provider interface for the Surya OCR engine.
@@ -22,11 +24,11 @@ type SuryaOCRProvider struct {
 
 // NewSuryaOCRProvider creates a new instance of SuryaOCRProvider.
 // It reads the Surya endpoint and authentication token from environment variables.
-func NewSuryaOCRProvider(cfg Config) *SuryaOCRProvider {
+func NewSuryaOCRProvider(cfg Config) (*SuryaOCRProvider, error) {
 	log.Printf("Initializing Surya OCR provider")
 	return &SuryaOCRProvider{
-		Endpoint: cfg.SuryaEndpoint, // Assuming a SuryaEndpoint field is added to Config
-		Token:    cfg.SuryaToken,    // Assuming a SuryaToken field is added to Config
+		Endpoint: cfg.SuryaEndpoint,
+		Token:    cfg.SuryaToken,
 	}
 }
 
@@ -80,21 +82,16 @@ func (p *SuryaOCRProvider) ProcessImage(ctx context.Context, imageData []byte, p
 		return nil, fmt.Errorf("failed to read surya API response body: %w", err)
 	}
 
-	var suryaResponse map[string]string
+	var suryaResponse struct {
+		Text string `json:"text"`
+	}
 
 	err = json.Unmarshal(bodyBytes, &suryaResponse)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal surya API response: %w, body: %s", err, string(bodyBytes))
 	}
 
-
-	ocrResult := &OCRResult{
-		Text: suryaResponse.Text,
-		Lines: make([]OCRLine, len(suryaResponse.Lines)),
-	}
-
-	for i, line := range suryaResponse.Lines {
-	}
+	ocrResult := &OCRResult{Text: suryaResponse.Text}
 
 	log.Printf("Surya API response status code: %d", resp.StatusCode)
 	return ocrResult, nil

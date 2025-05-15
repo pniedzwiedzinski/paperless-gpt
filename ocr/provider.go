@@ -34,7 +34,7 @@ type Config struct {
 
 	// Surya settings
 	SuryaEndpoint string
-	SuryaAuthToken string
+	SuryaToken string
 
 	// Mistral OCR settings
 	MistralAPIKey string
@@ -73,7 +73,7 @@ func NewProvider(config Config) (Provider, error) {
 	switch config.Provider {
 
 	case "surya":
-		if config.SuryaEndpoint == "" || config.SuryaAuthToken == "" {
+		if config.SuryaEndpoint == "" || config.SuryaToken == "" {
 			return nil, fmt.Errorf("missing required Surya configuration")
 		}
 		return NewSuryaOCRProvider(config)
